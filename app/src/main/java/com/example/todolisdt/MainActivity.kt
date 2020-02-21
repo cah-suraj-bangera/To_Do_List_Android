@@ -1,20 +1,23 @@
 package com.example.todolisdt
 
 import android.app.AlertDialog
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.InputType
-import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
         var title_Text : String = ""
         var desc_Text : String = ""
-        val toDoItemList = ArrayList<ToDoItem>()
+        var toDoItemList = ArrayList<ToDoItem>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,6 +35,8 @@ class MainActivity : AppCompatActivity() {
 
         inputDesc.inputType = InputType.TYPE_CLASS_TEXT
         builderDesc.setView(inputDesc)
+
+        loadData()
 
         createRecyclerView()
 
@@ -55,6 +60,17 @@ class MainActivity : AppCompatActivity() {
 
 
 
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+
+    }
+
+    override fun onPause() {
+        super.onPause()
+        saveData()
     }
 
 
@@ -95,6 +111,33 @@ class MainActivity : AppCompatActivity() {
         builderDesc.setNegativeButton("Cancel") { dialog, which ->
             inputTitle.text.clear()
             inputDesc.text.clear()
-            dialog.cancel()}
+            dialog.cancel() }
     }
+
+    private fun saveData()
+    {
+        var sharedPreferences : SharedPreferences = getSharedPreferences("Task Data", Context.MODE_PRIVATE)
+        var editor : SharedPreferences.Editor = sharedPreferences.edit()
+        var gson = Gson()
+        var json : String = gson.toJson(toDoItemList)
+        editor.putString("task list",json)
+        editor.apply()
+
+    }
+
+    private fun loadData()
+    {
+        var sharedPreferences : SharedPreferences = getSharedPreferences("Task Data", Context.MODE_PRIVATE)
+        var gson = Gson()
+        var json : String? = sharedPreferences.getString("task list", null)
+//        var type : Type = TypeToken<ArrayList<ToDoItem>>().type
+        if (!json.isNullOrEmpty())
+        {
+        val type = object : TypeToken<ArrayList<ToDoItem?>?>() {}.type
+        toDoItemList = gson.fromJson(json , type)
+        }
+    }
+
+
+
 }
