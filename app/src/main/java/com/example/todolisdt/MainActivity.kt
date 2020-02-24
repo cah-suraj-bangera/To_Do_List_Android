@@ -98,10 +98,10 @@ class MainActivity : AppCompatActivity() {
         builderDesc.setPositiveButton("OK") { dialog, which ->
             inputDesc.requestFocus()
             desc_Text = inputDesc.text.toString()
-            if (desc_Text.length != 0)
-            {
-                desc_Text = "Description: $desc_Text"
-            }
+//            if (desc_Text.length != 0)
+//            {
+//                desc_Text = "Description: $desc_Text"
+//            }
             toDoItemList.add(ToDoItem(title_Text,desc_Text))
             (recycler_view.adapter as ToDoItemAdapter).notifyDataSetChanged()
             inputTitle.text.clear()

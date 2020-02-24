@@ -37,18 +37,18 @@ class  ToDoItemAdapter (val toDoItemList: ArrayList<ToDoItem> , val listner : (T
             itemView.imgEdit.setOnClickListener {
                 var customDialog = BottomSheetDialog(context)
                 customDialog.setContentView(R.layout.input_new_item);
+                customDialog.newTitle.setText(toDoItem.title)
+                customDialog.newDescription.setText(toDoItem.desc)
                 customDialog.show()
-                var newTitle : String = customDialog.newTitle.toString()
-                var newDesc : String = customDialog.newDescription.toString()
-                if(toDoItem.title != newTitle && !newTitle.isNullOrEmpty() )
-                {
-                    toDoItem.title = newTitle
-                }
-                if(toDoItem.desc != newDesc && !newDesc.isNullOrEmpty() )
-                {
-                    toDoItem.desc != newDesc
+
+                customDialog.doneButton?.setOnClickListener {
+                    toDoItem.title = customDialog.newTitle.text.toString()
+                    toDoItem.desc = customDialog.newDescription.text.toString()
+                    notifyItemChanged(adapterPosition)
+                    customDialog.dismiss()
                 }
             }
+
         }
 
     }
