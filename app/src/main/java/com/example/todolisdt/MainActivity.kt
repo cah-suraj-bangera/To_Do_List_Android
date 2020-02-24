@@ -46,20 +46,20 @@ class MainActivity : AppCompatActivity() {
             builderTitle.show()
         }
 
+//        addSamples()
+    }
 
-//        val toDoItem1 = ToDoItem("Hiking","0")
-//        val toDoItem2 = ToDoItem("Hiking","1")
-//        val toDoItem3 = ToDoItem("Hiking","2")
-//        val toDoItem4 = ToDoItem("Hiking","3")
+    private fun addSamples() {
 
-//        toDoItemList.add(toDoItem1)
-//        toDoItemList.add(toDoItem2)
-//        toDoItemList.add(toDoItem3)
-//        toDoItemList.add(toDoItem4)
+        val toDoItem1 = ToDoItem("Hiking","0")
+        val toDoItem2 = ToDoItem("Hiking","1")
+        val toDoItem3 = ToDoItem("Hiking","2")
+        val toDoItem4 = ToDoItem("Hiking","3")
 
-
-
-
+        toDoItemList.add(toDoItem1)
+        toDoItemList.add(toDoItem2)
+        toDoItemList.add(toDoItem3)
+        toDoItemList.add(toDoItem4)
     }
 
 
