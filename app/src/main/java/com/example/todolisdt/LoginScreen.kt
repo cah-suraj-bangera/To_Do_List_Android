@@ -17,6 +17,9 @@ class LoginScreen : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login_screen)
+        if (getSupportActionBar() != null) {
+            getSupportActionBar()?.hide()
+        }
         mAuth = FirebaseAuth.getInstance();
         val providers = arrayListOf(
             AuthUI.IdpConfig.EmailBuilder().build())

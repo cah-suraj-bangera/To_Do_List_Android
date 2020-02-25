@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
 //        var desc_Text : String = ""
         var toDoItemList = ArrayList<ToDoItem>()
     private var mAuth: FirebaseAuth? = null
-    var currentUser : FirebaseUser? = null
+    var currentUser : String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,12 +33,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth!!.currentUser!!.uid
+        Log.d("Current_User", currentUser)
 
         loadData()
 
-        currentUser = mAuth!!.currentUser
 
-        currentUser?.uid.toString()
+
 
         createRecyclerView()
 
@@ -48,9 +49,11 @@ class MainActivity : AppCompatActivity() {
             customDialog.show()
 
             customDialog.doneButton?.setOnClickListener {
-                toDoItemList.add(ToDoItem(customDialog.newTitle.text.toString(),customDialog.newDescription.text.toString()))
-                recycler_view.adapter!!.notifyDataSetChanged()
-                saveData()
+                if (customDialog.newTitle.text.isNotEmpty() || customDialog.newDescription.text.isNotEmpty()) {
+                    toDoItemList.add(ToDoItem(customDialog.newTitle.text.toString(),customDialog.newDescription.text.toString()))
+                    recycler_view.adapter!!.notifyDataSetChanged()
+                    saveData()
+                }
                 customDialog.dismiss()
             }
         }
@@ -92,25 +95,29 @@ class MainActivity : AppCompatActivity() {
     private fun saveData()
     {
 //        Log.d("SaveData","Entered")
-        var sharedPreferences : SharedPreferences = getSharedPreferences(currentUser.toString(), Context.MODE_PRIVATE)
+        var sharedPreferences : SharedPreferences = getSharedPreferences("To Do Data", Context.MODE_PRIVATE)
         var editor : SharedPreferences.Editor = sharedPreferences.edit()
         var gson = Gson()
         var json : String = gson.toJson(toDoItemList)
-        editor.putString("task list",json)
+//        editor.putString("uid",currentUser)
+        editor.putString(currentUser,json)
         editor.apply()
 
     }
 
     private fun loadData()
     {
-        var sharedPreferences : SharedPreferences = this.getSharedPreferences(currentUser.toString(), Context.MODE_PRIVATE)
+        var sharedPreferences : SharedPreferences = this.getSharedPreferences("To Do Data", Context.MODE_PRIVATE)
         var gson = Gson()
-        var json : String? = sharedPreferences.getString("task list", null)
-        if (!json.isNullOrEmpty())
-        {
-        val type = object : TypeToken<ArrayList<ToDoItem>>() {}.type
-        toDoItemList = gson.fromJson(json , type)
-        }
+//        if(sharedPreferences.getString("uid","").equals(currentUser))
+//        {
+            var json : String? = sharedPreferences.getString(currentUser, null)
+            if (!json.isNullOrEmpty())
+            {
+                val type = object : TypeToken<ArrayList<ToDoItem>>() {}.type
+                toDoItemList = gson.fromJson(json , type)
+            }
+//        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
