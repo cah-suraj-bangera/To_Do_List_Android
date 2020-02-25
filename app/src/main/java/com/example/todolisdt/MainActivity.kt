@@ -1,49 +1,58 @@
 package com.example.todolisdt
 
-import android.app.AlertDialog
+
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.text.InputType
-import android.widget.EditText
+import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.input_new_item.*
 
 
 class MainActivity : AppCompatActivity() {
-        var title_Text : String = ""
-        var desc_Text : String = ""
+//        var title_Text : String = ""
+//        var desc_Text : String = ""
         var toDoItemList = ArrayList<ToDoItem>()
+    private var mAuth: FirebaseAuth? = null
+    var currentUser : FirebaseUser? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val builderTitle: AlertDialog.Builder = AlertDialog.Builder(this)
-        val builderDesc: AlertDialog.Builder = AlertDialog.Builder(this)
-
-        val inputTitle = EditText(this)
-        val inputDesc = EditText(this)
-
-        inputTitle.inputType = InputType.TYPE_CLASS_TEXT
-        builderTitle.setView(inputTitle)
-
-        inputDesc.inputType = InputType.TYPE_CLASS_TEXT
-        builderDesc.setView(inputDesc)
+        mAuth = FirebaseAuth.getInstance();
 
         loadData()
 
+        currentUser = mAuth!!.currentUser
+
+        currentUser?.uid.toString()
+
         createRecyclerView()
 
-        initializeBuilders(builderTitle,builderDesc,inputTitle,inputDesc)
-
         fab.setOnClickListener {
-            builderTitle.show()
+            var customDialog = BottomSheetDialog(this)
+            customDialog.setContentView(R.layout.input_new_item)
+            customDialog.show()
+
+            customDialog.doneButton?.setOnClickListener {
+                toDoItemList.add(ToDoItem(customDialog.newTitle.text.toString(),customDialog.newDescription.text.toString()))
+                recycler_view.adapter!!.notifyDataSetChanged()
+                saveData()
+                customDialog.dismiss()
+            }
         }
 
 //        addSamples()
@@ -65,7 +74,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
     }
 
     override fun onPause() {
@@ -80,43 +88,11 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this,"${it.title} Clicked !!!",Toast.LENGTH_SHORT).show()
         }
     }
-    private fun initializeBuilders(builderTitle : AlertDialog.Builder,builderDesc : AlertDialog.Builder,inputTitle : EditText,inputDesc : EditText) {
-
-        builderTitle.setTitle("Add new Task")
-        builderDesc.setTitle("Add Description of your new Task")
-
-        builderTitle.setPositiveButton("OK") { dialog, which ->
-            title_Text = inputTitle.text.toString()
-            builderDesc.show()
-            inputDesc.requestFocus()
-        }
-
-        builderTitle.setNegativeButton("Cancel") { dialog, which ->
-            inputTitle.text.clear()
-            dialog.cancel()}
-
-        builderDesc.setPositiveButton("OK") { dialog, which ->
-            inputDesc.requestFocus()
-            desc_Text = inputDesc.text.toString()
-//            if (desc_Text.length != 0)
-//            {
-//                desc_Text = "Description: $desc_Text"
-//            }
-            toDoItemList.add(ToDoItem(title_Text,desc_Text))
-            (recycler_view.adapter as ToDoItemAdapter).notifyDataSetChanged()
-            inputTitle.text.clear()
-            inputDesc.text.clear()
-        }
-
-        builderDesc.setNegativeButton("Cancel") { dialog, which ->
-            inputTitle.text.clear()
-            inputDesc.text.clear()
-            dialog.cancel() }
-    }
 
     private fun saveData()
     {
-        var sharedPreferences : SharedPreferences = getSharedPreferences("Task Data", Context.MODE_PRIVATE)
+//        Log.d("SaveData","Entered")
+        var sharedPreferences : SharedPreferences = getSharedPreferences(currentUser.toString(), Context.MODE_PRIVATE)
         var editor : SharedPreferences.Editor = sharedPreferences.edit()
         var gson = Gson()
         var json : String = gson.toJson(toDoItemList)
@@ -127,17 +103,32 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadData()
     {
-        var sharedPreferences : SharedPreferences = getSharedPreferences("Task Data", Context.MODE_PRIVATE)
+        var sharedPreferences : SharedPreferences = this.getSharedPreferences(currentUser.toString(), Context.MODE_PRIVATE)
         var gson = Gson()
         var json : String? = sharedPreferences.getString("task list", null)
-//        var type : Type = TypeToken<ArrayList<ToDoItem>>().type
         if (!json.isNullOrEmpty())
         {
-        val type = object : TypeToken<ArrayList<ToDoItem?>?>() {}.type
+        val type = object : TypeToken<ArrayList<ToDoItem>>() {}.type
         toDoItemList = gson.fromJson(json , type)
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.top_rght_menu_min_activity,menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if(item.title.equals("Sign Out"))
+        {
+            FirebaseAuth.getInstance().signOut()
+            startActivity(Intent(this,LoginScreen::class.java))
+            finish()
+        }
+        return super.onOptionsItemSelected(item)
+
+    }
 
 
 }
