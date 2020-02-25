@@ -14,7 +14,7 @@
         android:id="@+id/item_view_vertical_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorAccent"
+        android:background="@color/colorPrimary"
         android:baselineAligned="false"
         android:orientation="vertical"
         android:padding="5dp">

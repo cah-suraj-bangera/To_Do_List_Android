@@ -7,19 +7,18 @@
     android:orientation="vertical"
     android:paddingLeft="20dp"
     android:paddingTop="20dp"
-    android:paddingRight="20dp">
+    android:paddingRight="20dp"
+    >
     <EditText
         android:id="@+id/newTitle"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="@android:color/transparent"
         android:hint="Enter title"/>
     <EditText
         android:id="@+id/newDescription"
         android:layout_marginTop="15dp"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:background="@android:color/transparent"
         android:hint="Enter description"
         android:gravity="top"/>
     <Button
@@ -28,5 +27,6 @@
         android:layout_height="wrap_content"
         android:text="Done"
         android:clickable="true"
+        android:backgroundTint="@color/colorPrimaryDark"
         android:background="@android:color/white"/>
 </LinearLayout>
